@@ -1,0 +1,13 @@
+.svgHighlight{
+	fill:rgb(179, 11, 10) !important;
+	font-weight:bold;
+}
+
+.xlink:hover polygon{
+	opacity: 0.5;
+}
+
+text {
+	font-size:7px;
+	
+}

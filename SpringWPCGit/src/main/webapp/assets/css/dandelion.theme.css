@@ -1,0 +1,38 @@
+body
+{
+	background-image:url(../../assets/images/bg/stripes.png);
+}
+
+div#da-header #da-header-top
+{
+	background-image:url(../../assets/images/headers/leather.png);
+}
+
+/* River
+================================================== */
+span.group_num {font-weight:bold; display:inline; padding-left:5px;}
+span.group_num:before {content:"(";}
+span.group_num:after {content:")";}
+span.list_num {font-weight:bold; display:inline; padding-left:5px;}
+span.list_num:before {content:"(";}
+span.list_num:after {content:")";}
+span.email_desc {font-weight:bold; display:inline; padding-left:10px;}
+span.email_desc:before {content:"[";}
+span.email_desc:after {content:"]";}
+span.tele_desc {font-weight:bold; display:inline; padding-left:10px;}
+span.tele_desc:before {content:"[";}
+span.tele_desc:after {content:"]";}
+span.url_desc {font-weight:bold; display:inline; padding-left:10px;}
+span.url_desc:before {content:"[";}
+span.url_desc:after {content:"]";}
+span.options{font-weight:bold; display:inline; padding-right:10px;}
+
+.textbox{background-color: #fcfcfc; border: 1px solid #d1d1d1; outline: none; line-height: 18px; max-height: 70px; padding: 4px; margin: 0; color: #444; border-radius: 3px;}
+.textbox-2 {background-color: #fcfcfc; border: 1px solid #d1d1d1; outline: none; line-height: 18px; max-height: 140px; padding: 4px; margin: 0; color: #444; border-radius: 3px; min-height:70px;}
+
+.da-table-container .da-form{border: 1px solid #d3d3d3; border-top:0; border-radius: 3px;outline: none;}
+
+.inline-form {display:inline;}
+.inline-form-right {display:inline; float:right; padding: 0px 10px;}
+
+.la-label{font-size: 12px; line-height: 14px; color: #333333; padding-right:5px;}

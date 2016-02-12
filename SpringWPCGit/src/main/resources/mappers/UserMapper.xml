@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.latis.wpc.mapper.WpcMapper">
+
+	<resultMap id="hashmap" type="java.util.HashMap" />
+
+	<resultMap type="com.latis.wpc.dto.user.WpcUser" id="CheckPwd">
+		<result property="pwd" column="pwd" />
+		
+	</resultMap>
+
+	<!-- User -->
+	<select id="getUser" parameterType="hashmap"
+		resultType="com.latis.wpc.dto.user.WpcUser">
+		select
+			id,
+			pwd,
+			user_name,
+			mail,
+			phone,
+			mobile,
+			title,
+			department,
+			manage_auth
+		from
+		epc_user
+		where
+		id = #{id};
+	</select>
+
+	<select id="getUserList" resultType="com.latis.wpc.dto.user.WpcUser">
+		SELECT
+		id,
+		user_name,
+		mail,
+		phone,
+		mobile,
+		title,
+		department,
+		manage_auth
+		FROM
+		epc_user;
+	</select>
+
+	<select id="getSuperUserList" resultMap="hashmap">
+		SELECT
+		id,
+		user_name,
+		mail,
+		phone,
+		mobile,
+		title,
+		department,
+		manage_auth
+		FROM
+		epc_user
+		where
+		manage_auth = 's';
+	</select>
+
+	<insert id="addUser" parameterType="hashMap">
+		INSERT INTO epc_user(
+		id,
+		pwd,
+		user_name,
+		mail,
+		phone,
+		mobile,
+		title,
+		department,
+		manage_auth
+		)
+		VALUES (
+		#{id},
+		#{pwd},
+		#{user_name},
+		#{mail},
+		#{phone},
+		#{mobile},
+		#{title},
+		#{department},
+		#{manage_auth}
+		);
+	</insert>
+
+	<update id="editUser" parameterType="hashMap">
+		UPDATE
+		epc_user
+		SET
+		pwd = #{pwd},
+		user_name = #{user_name},
+		mail = #{mail},
+		phone = #{phone},
+		mobile = #{mobile},
+		title = #{title},
+		department = #{department},
+		manage_auth = #{manage_auth}
+		WHERE
+		id = #{id};
+	</update>
+
+	<delete id="deleteUser" parameterType="hashMap">
+		DELETE FROM
+		epc_user
+		WHERE
+		id = #{id};
+	</delete>
+
+	<select id="searchUser" parameterType="hashMap" resultType="com.latis.wpc.dto.user.WpcUser">
+		select
+		id,
+		pwd,
+		user_name,
+		mail,
+		phone,
+		mobile,
+		title,
+		department,
+		manage_auth
+		from
+		epc_user
+		<where>
+			<if test="id != null">
+				lower(id) like lower(#{id});
+			</if>
+			<if test="user_name != null">
+				lower(user_name) like lower(#{user_name});
+			</if>
+			<if test="title != null">
+				title like #{title};
+			</if>
+			<if test="department != null">
+				department like #{department};
+			</if>
+			<if test="manage_auth != null">
+				manage_auth like #{manage_auth};
+			</if>
+		</where>
+	</select>
+	<!-- Group -->
+
+	<select id="getGroupUserList" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		epc_user.id,
+		epc_user.user_name
+		FROM
+		epc_user
+		INNER JOIN
+		group_grant
+		ON
+		group_grant.id = epc_user.id
+		WHERE
+		group_grant.group_id = #{groupId}
+		group by
+		epc_user.idx;
+	</select>
+
+	<select id="getAllGroupList" resultType="com.latis.wpc.dto.group.WpcGroup">
+		SELECT
+		group_id,
+		create_date,
+		last_modiefied_date,
+		id
+		FROM
+		group_list;
+	</select>
+
+	<select id="getOwnGroupList" resultMap="hashmap">
+		SELECT
+		group_id,
+		create_date,
+		last_modiefied_date,
+		id
+		FROM
+		group_list
+		WHERE
+		id = #{id};
+	</select>
+
+	<select id="getAllEpcList" resultMap="hashmap">
+		SELECT
+		model_id
+		FROM epc_model
+	</select>
+
+	<select id="checkEpcContain" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		model_id
+		FROM epc_model
+		WHERE
+		lower(model_id) = lower(#{model_id});
+	</select>
+
+	<select id="getCurrentGroupEpcList" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		epc_model.model_id
+		FROM
+		epc_model
+		INNER JOIN
+		group_grant
+		ON
+		group_grant.model_id = epc_model.model_id
+		WHERE
+		group_grant.group_id = #{groupId}
+		group by
+		epc_model.idx;
+	</select>
+
+	<insert id="addGroup" parameterType="hashMap">
+		INSERT INTO group_list (
+		group_id,
+		create_date,
+		last_modiefied_date,
+		id
+		)
+		VALUES (
+		#{groupId},
+		#{currentTime},
+		#{currentTime},
+		#{userId}
+		);
+	</insert>
+
+	<delete id="deleteGroup" parameterType="hashMap">
+		DELETE FROM
+		group_list
+		WHERE
+		group_id = #{groupId};
+	</delete>
+
+	<delete id="deleteGroupGrant" parameterType="hashMap">
+		DELETE FROM
+		group_grant
+		WHERE
+		group_id = #{groupId};
+	</delete>
+
+	<update id="editGroup" parameterType="hashMap">
+		UPDATE group_list
+		SET
+		group_id = #{groupId},
+		last_modiefied_date = #{currentTime}
+		WHERE
+		group_id = #{groupId};
+	</update>
+
+	<insert id="editGroupMember">
+		INSERT INTO group_grant (
+		group_id,
+		id,
+		model_id
+		) values (
+		#{groupId},
+		#{id},
+		#{modelId}
+		);
+	</insert>
+
+	<select id="searchGroup" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		group_id,
+		create_date,
+		last_modiefied_date,
+		id
+		FROM
+		group_list
+		WHERE
+		lower(group_id) LIKE lower(#{keyword});
+
+	</select>
+
+	<!-- Epc -->
+
+	<select id="loadEpcStatList" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		model_id,
+		id,
+		create_date,
+		last_modified_date,
+		stat
+		FROM
+		epc_stat
+		WHERE
+		id = #{userId};
+	</select>
+
+	<insert id="addEpc" parameterType="hashMap">
+		INSERT INTO epc_model (
+		model_id
+		)
+		VALUES(
+		#{epcName}
+		);
+
+	</insert>
+
+	<select id="checkSvgId" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		svg_id
+		FROM
+		svg
+		WHERE
+		svg_id = #{svg_id};
+	</select>
+
+	<insert id="addEpcStat" parameterType="hashMap">
+		INSERT INTO epc_stat (
+		model_id,
+		id,
+		create_date,
+		last_modified_date,
+		stat
+		)
+		VALUES(
+		#{epcName},
+		#{id},
+		#{date},
+		#{date},
+		#{stat}
+		);
+	</insert>
+
+	<insert id="addSvgItem" parameterType="hashMap">
+		INSERT INTO svg (
+		model_id,
+		svg_id,
+		svg_name,
+		parent_model,
+		path
+		)
+		VALUES (
+		#{model_id},
+		#{svg_id},
+		#{svg_name},
+		#{parent},
+		#{path}
+		);
+	</insert>
+
+	<insert id="addBomHeadItem" parameterType="hashMap">
+		INSERT INTO bom_def (
+		bom_column_index,
+		bom_column_name
+		)
+		VALUES (
+		#{bom_column_index},
+		#{bom_column_name}
+		);
+	</insert>
+
+	<insert id="addBomDataItem" parameterType="hashMap">
+		INSERT INTO bom_data (
+		model_id,
+		svg_id,
+		column_1,
+		column_2,
+		column_3,
+		column_4,
+		column_5,
+		column_6,
+		column_7,
+		column_8,
+		column_9,
+		column_10
+		)
+		VALUES (
+		#{model_id},
+		#{svg_id},
+		#{column_0},
+		#{column_1},
+		#{column_2},
+		#{column_3},
+		#{column_4},
+		#{column_5},
+		#{column_6},
+		#{column_7},
+		#{column_8},
+		#{column_9}
+		);
+	</insert>
+
+	<update id="epcUploadStatEnd" parameterType="hashMap">
+		UPDATE
+		epc_stat
+		SET
+		model_id = #{epcName},
+		id = #{id},
+		last_modified_date = #{date},
+		stat = #{stat}
+		WHERE
+		model_id = #{epcName}
+	</update>
+
+	<select id="checkSvgIdContain" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		svg_id
+		FROM
+		svg
+		WHERE
+		path = #{path};
+	</select>
+
+	<select id="checkBomIdContain" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		svg_id
+		FROM
+		svg
+		WHERE
+		svg_id = #{svgId};
+	</select>
+
+	<delete id="removeEpcManageBomData" parameterType="hashMap">
+		DELETE FROM
+		bom_data
+		WHERE
+		model_id = #{epcName}
+		<if test='svgId != ""'>
+			AND svg_id = #{svgId};
+		</if>
+	</delete>
+
+	<delete id="removeEpcManageSvgData" parameterType="hashMap">
+		DELETE FROM
+		svg
+		WHERE
+		model_id = #{epcName}
+		<if test='svgId != ""'>
+			AND svg_id = #{svgId};
+		</if>
+	</delete>
+
+	<delete id="removeEpcManageEpcStat" parameterType="hashMap">
+		DELETE FROM
+		epc_stat
+		WHERE
+		model_id = #{epcName};
+	</delete>
+
+	<delete id="removeEpcManageEpcList" parameterType="hashMap">
+		DELETE FROM
+		epc_model
+		WHERE
+		model_id = #{epcName};
+	</delete>
+
+	<update id="removeEpcManageCategory" parameterType="hashMap">
+		UPDATE
+		epc_category
+		SET
+		model_id = null
+		WHERE
+		model_id = #{epcName};
+	</update>
+
+	<select id="searchEpcStatList" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		model_id,
+		id,
+		create_date,
+		last_modified_date,
+		stat
+		FROM
+		epc_stat
+		WHERE
+		lower(model_id) LIKE lower(#{model_id});
+	</select>
+
+	<update id="editFileName" parameterType="hashMap">
+		UPDATE
+		svg
+		SET
+		svg_name = #{newName}
+		WHERE
+		svg_id = #{svgId}
+		AND
+		model_id = #{epcName};
+	</update>
+
+	<!-- Content -->
+
+	<select id="checkGroup" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		epc_model.model_id
+		FROM
+		epc_model
+		INNER JOIN
+		group_grant
+		ON
+		group_grant.model_id = epc_model.model_id
+		WHERE
+		id=#{userId}
+		group by
+		epc_model.idx;
+	</select>
+
+	<select id="getBomDef" resultMap="hashmap">
+		SELECT
+		cast(bom_column_index as int),
+		bom_column_name
+		FROM
+		bom_def
+		order by
+		cast(bom_column_index as int);
+	</select>
+
+	<select id="getBomData" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		svg_id,
+		column_1,
+		column_2,
+		column_3,
+		column_4,
+		column_5,
+		column_6,
+		column_7,
+		column_8,
+		column_9,
+		column_10
+		FROM
+		bom_data
+		where
+		lower(svg_id) = lower(#{svgId})
+		order by
+		cast(column_1 as float);
+	</select>
+
+	<select id="getCartData" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		svg_id,
+		column_1,
+		column_2,
+		column_3,
+		column_4,
+		column_5,
+		column_6,
+		column_7,
+		column_8,
+		column_9,
+		column_10
+		FROM
+		bom_data
+		where
+		lower(svg_id) = lower(#{svg_id})
+		and
+		lower(column_2) = lower(#{column_2})
+		order by
+		cast(column_1 as float);
+	</select>
+
+
+
+	<!-- Content -->
+
+	<select id="getSearchColumnIndex" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		bom_column_index
+		FROM
+		bom_def
+		WHERE
+		bom_column_name = #{column_name};
+
+	</select>
+
+	<select id="epcSearch" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		bom_data.svg_id,
+		bom_data.column_1,
+		bom_data.column_2,
+		bom_data.column_3,
+		bom_data.column_4,
+		bom_data.column_5,
+		bom_data.column_6,
+		bom_data.column_7,
+		bom_data.column_8,
+		bom_data.column_9,
+		bom_data.column_10
+		FROM
+		bom_data
+		INNER JOIN
+		epc_category
+		ON
+		epc_category.model_id = bom_data.model_id
+
+		WHERE
+		epc_category.category_name = #{category_name}
+		AND
+		epc_category.parent_category = #{parent_category}
+
+		<if test="model_id != null">
+			AND lower(bom_data.model_id) like lower(#{model_id})
+		</if>
+		<if test="column_1 != null">
+			AND lower(bom_data.column_1) lower(like #{column_1})
+		</if>
+		<if test="column_2 != null">
+			AND lower(bom_data.column_2) like lower(#{column_2})
+		</if>
+		<if test="column_3 != null">
+			AND lower(bom_data.column_3) like lower(#{column_3})
+		</if>
+		<if test="column_4 != null">
+			AND lower(bom_data.column_4) like lower(#{column_4})
+		</if>
+		<if test="column_5 != null">
+			AND lower(bom_data.column_5) like lower(#{column_5})
+		</if>
+		<if test="column_6 != null">
+			AND lower(bom_data.column_6) like lower(#{column_6})
+		</if>
+		<if test="column_7 != null">
+			AND lower(bom_data.column_7) like lower(#{column_7})
+		</if>
+		<if test="column_8 != null">
+			AND lower(bom_data.column_8) like lower(#{column_8})
+		</if>
+		<if test="column_9 != null">
+			AND lower(bom_data.column_9) like lower(#{column_9})
+		</if>
+		<if test="column_10 != null">
+			AND lower(bom_data.column_10) like lower(#{column_10})
+		</if>
+		ORDER BY
+		cast(bom_data.column_1 as float);
+	</select>
+
+	<select id="getSvgFilePath" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		path
+		FROM
+		svg
+		WHERE
+		lower(svg_id) = lower(#{svgId});
+
+	</select>
+
+	<!-- Category -->
+
+	<select id="loadAllCategory" resultMap="hashmap">
+		SELECT
+		*
+		FROM
+		epc_category;
+	</select>
+
+	<select id="loadCategoyInfo" parameterType="hashMap" resultMap="hashmap">
+		SELECT
+		category_name
+		FROM
+		epc_category
+		WHERE
+		parent_category = #{parentCategory}
+		group by
+		category_name;
+	</select>
+
+	<select id="loadCurrentCategoyEpcInfo" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		model_id
+		FROM
+		epc_category
+		WHERE
+		parent_category = #{parent}
+		AND
+		category_name = #{current};
+	</select>
+
+	<select id="loadCurrentUserEpcList" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		epc_model.model_id
+		FROM
+		epc_model
+		INNER JOIN
+		group_grant
+		ON
+		group_grant.model_id = epc_model.model_id
+		where
+		group_grant.id = #{id}
+		group by
+		epc_model.idx;
+	</select>
+
+
+	<select id="loadAllCategoryEpcInfo" resultMap="hashmap">
+		select
+		model_id
+		from
+		epc_category
+		where
+		model_id is not null
+		group by
+		model_id;
+	</select>
+
+	<select id="getParentCategory" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		category_index,
+		category_level,
+		category_name,
+		parent_category
+		FROM
+		epc_category
+		WHERE
+		category_name = #{categoryName};
+	</select>
+
+	<select id="getCurrentEpcCategory" parameterType="hashMap"
+		resultMap="hashmap">
+		SELECT
+		parent_category,
+		category_name
+		FROM
+		epc_category
+		WHERE
+		lower(model_id) = lower(#{epcName});
+	</select>
+
+
+
+	<insert id="insertCategory" parameterType="hashMap">
+		insert into epc_category(
+		category_index,
+		category_level,
+		category_name,
+		parent_category,
+		model_id
+		)values(
+		#{category_index},
+		#{category_level},
+		#{category_name},
+		#{parent_category},
+		<if test="model_id != null">
+			#{model_id}
+		</if>
+		<if test="model_id == null">
+			null
+		</if>
+		);
+
+	</insert>
+
+	<update id="editCategoryName" parameterType="hashMap">
+		update
+		epc_category
+		set
+		category_name = #{newName}
+		where
+		category_name = #{oldName};
+	</update>
+
+	<update id="editParentCategory" parameterType="hashMap">
+		update
+		epc_category
+		set
+		parent_category = #{newName}
+		where
+		parent_category = #{oldName};
+	</update>
+
+	<delete id="deleteCategory" parameterType="hashMap">
+		delete from
+		epc_category
+		where
+		category_name = #{category_name}
+		and
+		parent_category = #{parent_category};
+	</delete>
+
+	<delete id="deleteAllCategory">
+		delete from
+		epc_category;
+	</delete>
+</mapper>

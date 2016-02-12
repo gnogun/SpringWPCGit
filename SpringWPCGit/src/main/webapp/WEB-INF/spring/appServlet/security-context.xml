@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config></context:annotation-config>
+
+	<security:http pattern="/login.do" security="none"></security:http>
+
+	<security:http auto-config='true' use-expressions="true">
+		<!-- autoconfig=false 면? filter도 -->
+		<!-- <security:intercept-url pattern="/login" access="isAnonymous()" /> -->
+		
+		
+		<!-- access 이름들은 prefix가 정해져 있음 (default값 ROLE_ ) 
+			재정의 하는 방법은 찾아놨는데 이름을 뭘 붙일지 몰라서 그냥 default prefix 사용했음-->
+			
+		<security:intercept-url pattern="/user/*"
+			access="hasAnyRole('ROLE_u', 'ROLE_s', 'ROLE_a')" />
+			
+		<security:intercept-url pattern="/manage/*"
+			access="hasAnyRole('ROLE_s', 'ROLE_a')" />
+			
+		<security:intercept-url pattern="/admin/*"
+			access="hasRole('ROLE_a')" />
+			
+		<security:access-denied-handler
+			error-page="/login.do" />
+
+		<security:intercept-url pattern="/*" access="permitAll" />
+		<!-- access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')" -->
+
+		<!-- 
+		<security:anonymous /> 
+		<security:x509/> 
+		<security:http-basic /> 
+		<security:session-management></security:session-management> 
+		<security:expression-handler ref=""/> 
+		<security:custom-filter ref=""/> 
+		<security:port-mappings></security:port-mappings> 
+		<security:request-cache ref=""/> 
+		<security:remember-me/> -->
+					
+		<!-- always-use-default-target='true' = 서버가 죽었다 살아났을때 기존 가려고 했던 페이지를 무시하고 무조건 handler에 정의된 페이지로 이동 -->
+
+		<security:form-login 
+			login-page="/login.do"
+			default-target-url="/main" 
+			authentication-success-handler-ref="loginSuccessHandler"
+			authentication-failure-handler-ref="loginFailureHandler"			
+			always-use-default-target="true" 
+			login-processing-url="/loginProcess"
+			username-parameter="username" 
+			password-parameter="password"
+			
+			 />
+		<!-- authentication-failure-url="/login" login-processing-url="" password-parameter="" 
+			username-parameter="" -->
+			
+		
+
+		<security:logout logout-url="/logout" logout-success-url="/login.do" />
+		
+		
+		<!-- delete-cookies="" logout-url="" invalidate-session="true" success-handler-ref="" -->
+
+	</security:http>
+
+	<security:authentication-manager>
+
+		<!-- <security:authentication-provider ref="userProvider"> </security:authentication-provider> -->
+		<security:authentication-provider ref="CustomAuthenticationProvider" >
+		</security:authentication-provider>
+
+	</security:authentication-manager>
+	
+	
+	<bean id="CustomAuthenticationProvider" 
+		class="com.latis.wpc.service.security.CustomAuthenticationProvider" >
+		<property name="userDetailsService" ref="userService"></property>		
+		
+	</bean>
+
+	<bean id="userService" class="com.latis.wpc.service.security.UserService" />
+	<!-- 
+	 -->
+	<bean id="sha1Encoder"
+		class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+		<constructor-arg>
+			<value>1</value>
+		</constructor-arg>
+		<property name="encodeHashAsBase64" value="true"></property>
+	</bean>
+
+	<bean id="saltSource"
+		class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+		<property name="userPropertyToUse" value="salt" />
+	</bean>
+	
+	
+	<bean id="loginSuccessHandler" class="com.latis.wpc.handler.security.LoginSuccessHandler"></bean>
+	<bean id="loginFailureHandler" class="com.latis.wpc.handler.security.LoginFailureHandler"></bean>
+
+
+	<!-- 
+	<bean id="standardEncoder"
+		class="org.springframework.security.crypto.password.StandardPasswordEncoder">
+	</bean>
+	<bean id="bcryptEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</bean>
+	 -->
+
+
+	
+
+</beans>
+
+
+
+

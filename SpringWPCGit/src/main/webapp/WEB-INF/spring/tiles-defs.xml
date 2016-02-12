@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions 
+PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+	<definition name="base" template="/WEB-INF/views/base/base.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/base/_header.jsp" />
+		<put-attribute name="left" value="/WEB-INF/views/base/_left.jsp" />
+		<put-attribute name="right" value="/WEB-INF/views/base/_right.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/base/_footer.jsp" />
+	</definition>
+	
+	<definition name="login" extends="base">
+		<put-attribute name="right" value="/WEB-INF/views/base/right/login.jsp" />
+	</definition>
+	
+	<definition name="commonAdminPage" extends="base">
+		<put-attribute name="header"   value="/WEB-INF/views/base/header/header1.jsp"/> 
+		<put-attribute name="left"   value="/WEB-INF/views/base/left/manage.jsp"/>
+		<put-attribute name="footer"   value="/WEB-INF/views/base/footer/footer1.jsp"/>
+	</definition>
+	
+	<definition name="*/userManage" extends="commonAdminPage">
+		<put-attribute name="right"   value="/WEB-INF/views/base/right/user_list.jsp"/>
+	</definition>
+	
+	<definition name="*/groupManage" extends="commonAdminPage">
+		<put-attribute name="right"   value="/WEB-INF/views/base/right/group_list.jsp"/>
+	</definition>
+	
+	<definition name="*/upload" extends="commonAdminPage">
+		<put-attribute name="right"   value="/WEB-INF/views/base/right/wpc_list.jsp"/>
+	</definition>
+	
+	<definition name="*/category" extends="commonAdminPage">
+		<put-attribute name="right"   value="/WEB-INF/views/base/right/category.jsp"/>
+	</definition>
+	
+	<definition name="*/index" extends="commonAdminPage">
+		<put-attribute name="right"   value="/WEB-INF/views/base/right/content.jsp"/>
+	</definition>
+	
+
+</tiles-definitions>
